@@ -3,7 +3,10 @@
     <words>
       <w>addr</w>
       <w>cflags</w>
+      <w>dequeue</w>
+      <w>dequeuing</w>
       <w>malloc</w>
+      <w>nalaka</w>
       <w>newthread</w>
       <w>oldthread</w>
       <w>printf</w>

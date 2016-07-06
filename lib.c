@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "threadlib.h"
+#include "queue.h"
 
 #define DEBUG
 /* uncomment when you are done! */
@@ -15,12 +16,16 @@
 /* information about threads */
 struct tcb { 
     void *sp;  /* Address of stack pointer Keep this as first element would ease switch.S You can do something else as well.*/
+    int state; /* 0 for sleeping 1 for running*/
 
     /* you will need others stuff */ 
 };
 
 typedef struct tcb tcb_t;
 typedef struct tcb *TCB;
+
+Queue *queue1, *queue2;
+int flag = 1;
 
 /**
  * assembly code for switching 
@@ -31,13 +36,19 @@ typedef struct tcb *TCB;
 */
 void machine_switch(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */);
 void switch_threads(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */);
+void init_thread_queue(void);
 		    
 
-/** Data structures and functions to support thread control box */ 
+/** Data structures and functions to support thread control box */
 
+void init_thread_queue(void) {
+    if (flag == 1) {
+        queue1 = queueCreate();
+        queue2 = queueCreate();
+    }
 
-
-
+    flag = 0;
+}
 
 /** end of data structures */
 
@@ -81,7 +92,8 @@ void *malloc_stack() {
     return ptr;
 }
 
-int create_thread(void (*ip)(void)) {	
+int create_thread(void (*ip)(void)) {
+    init_thread_queue();
     long int *stack;
     stack = malloc_stack();
     if(!stack) return -1; /* no memory? */
@@ -93,6 +105,14 @@ int create_thread(void (*ip)(void)) {
     * most element in the stack should be return ip. So we create a stack with the address of the function 
     * we want to run at this slot. 
     */
+
+    tcb_t *thread_tcb = (tcb_t *) malloc(sizeof(tcb_t));
+
+    thread_tcb -> sp = stack;
+    thread_tcb -> state = 0;
+
+    enqueue(queue1, thread_tcb);
+    PRINT("TCB = %p size = %d\n", thread_tcb, queue1 -> size);
 
     return 0;
 }
@@ -109,7 +129,7 @@ void delete_thread(void) {
     * make sure to exit when all user-level threads are dead */ 
 
        
-    assert(!printf("Implement %s",__func__));
+    //assert(!printf("Implement %s",__func__));
 }
 
 
@@ -119,5 +139,5 @@ void stop_main(void) {
     * Do not put it into our ready queue, switch to something else.*/
 
 
-    assert(!printf("Implement %s",__func__));
+    //assert(!printf("Implement %s",__func__));
 }
