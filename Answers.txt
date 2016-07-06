@@ -1,0 +1,13 @@
+1. 	-I specify the include files' path
+	-Wall allow warnings to display when the executions
+	-Werror Make all warnings into errors
+	-Wstrict-prototypes check prototypes with data types and give warnings
+
+2. 	#ifndef 
+	#define 
+	#endif
+
+3.	Prototype is define in the header file nad linker will find the where is the function
+
+4. 	calling convention of linux x86_64 is define stack has to align in 16 bytes range
+
