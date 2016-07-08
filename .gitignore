@@ -29,6 +29,9 @@
 *.hex
 main
 
+# IDE
+.idea
+
 # Debug files
 *.dSYM/
 *.su

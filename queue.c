@@ -77,6 +77,16 @@ void queueDestroy(Queue *queue) {
 	queue = NULL;
 }
 
+void *queuePeek(Queue *queue) {
+    /*return the first element of the queue without removing*/
+
+    if (!queueIsEmpty(queue)) {
+        return (queue -> front) -> data_q;
+    }
+
+    return '\0';
+}
+
 /*
 int main() {
 	Queue *queue1 = queueCreate();
@@ -88,6 +98,7 @@ int main() {
     enqueue(queue1, (void *) 'c');
     enqueue(queue1, (void *) 'd');
 
+    printf("peek = %ld\n", (long) queuePeek(queue1));
 
 	void *c;
 
@@ -100,7 +111,7 @@ int main() {
 
 	enqueue(queue1, (void *) 'e');
 	enqueue(queue1, (void *) 'f');
-
+    printf("peek = %ld\n", (long) queuePeek(queue1));
 
 	printf("\nFully emptying\n");
 	while (!queueIsEmpty(queue1)) {
@@ -112,4 +123,4 @@ int main() {
 		
 	return 0;	
 }
-*/
+ */

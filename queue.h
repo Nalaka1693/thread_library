@@ -25,4 +25,6 @@ int dequeue(Queue *queue, void **data);
 
 void queueDestroy(Queue *queue);
 
+void *queuePeek(Queue *queue);
+
 #endif //THREAD_QUEUE_H

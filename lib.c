@@ -17,6 +17,7 @@
 struct tcb { 
     void *sp;  /* Address of stack pointer Keep this as first element would ease switch.S You can do something else as well.*/
     int state; /* 0 for sleeping 1 for running*/
+    void *malloc_addr;
 
     /* you will need others stuff */ 
 };
@@ -24,7 +25,7 @@ struct tcb {
 typedef struct tcb tcb_t;
 typedef struct tcb *TCB;
 
-Queue *queue1, *queue2;
+Queue *queue;
 int flag = 1;
 
 /**
@@ -43,8 +44,7 @@ void init_thread_queue(void);
 
 void init_thread_queue(void) {
     if (flag == 1) {
-        queue1 = queueCreate();
-        queue2 = queueCreate();
+        queue = queueCreate();
     }
 
     flag = 0;
@@ -57,7 +57,7 @@ void init_thread_queue(void) {
 void switch_threads(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */) {
   /* This is basically a front end to the low-level assembly code to switch. */
  
-    assert(!printf("Implement %s",__func__));
+    machine_switch(newthread, oldthread);
 }
 
 
@@ -87,7 +87,7 @@ void *malloc_stack() {
     /* allocate something aligned at 16 */
     void *ptr = malloc(STACK_SIZE + 16);
     if (!ptr) return NULL;
-    ptr = (void *)(((long int) ptr & (-1 << 4)) + 0x10);
+    //ptr = (void *)(((long int) ptr & (-1 << 4)) + 0x10);
 
     return ptr;
 }
@@ -108,18 +108,34 @@ int create_thread(void (*ip)(void)) {
 
     tcb_t *thread_tcb = (tcb_t *) malloc(sizeof(tcb_t));
 
-    thread_tcb -> sp = stack;
-    thread_tcb -> state = 0;
+    enqueue(queue, thread_tcb);
 
-    enqueue(queue1, thread_tcb);
-    PRINT("TCB = %p size = %d\n", thread_tcb, queue1 -> size);
+    thread_tcb -> malloc_addr = stack;
+    thread_tcb -> state = 0;
+    long int *align_top = (void *)(((long int) stack & (-1 << 4)) + STACK_SIZE);
+    thread_tcb -> sp = align_top;
+
+    *(align_top-1) = (long int) ip;
+    *(align_top-2) = (long int) align_top;
+
+#ifdef DEBUG
+    PRINT("TCB = %p size = %d\n", thread_tcb, queue -> size);
+#endif
 
     return 0;
 }
 
 void yield() {
     /* thread wants to give up the CPU just call the scheduler to pick the next thread. */
+    void  *current;
+    dequeue(queue, &current);
+#ifdef DEBUG
+    PRINT("current = %p\n", current);
+    PRINT("new thr = %p\n", queuePeek(queue));
+#endif
 
+    enqueue(queue, current);
+    switch_threads(current, queuePeek(queue));
 }
 
 

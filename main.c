@@ -35,10 +35,10 @@ void thread2(void) {
 
 int main(void) { 
     printf("Creating thread 1\n");
-    assert(!create_thread(thread2));
+    assert(!create_thread(thread1));
 
     printf("Creating thread 2\n");
-    assert(!create_thread(thread1));
+    assert(!create_thread(thread2));
 
     //stop_main();        /* give up the CPU */
     //assert(0);          /* you should not come back */
