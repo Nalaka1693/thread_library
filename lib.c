@@ -18,8 +18,6 @@ struct tcb {
     void *sp;  /* Address of stack pointer Keep this as first element would ease switch.S You can do something else as well.*/
     int state; /* 0 for sleeping 1 for running*/
     void *malloc_addr;
-
-    /* you will need others stuff */ 
 };
 
 typedef struct tcb tcb_t;
@@ -51,8 +49,6 @@ void init_thread_queue(void) {
 }
 
 /** end of data structures */
-
-
 
 void switch_threads(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */) {
   /* This is basically a front end to the low-level assembly code to switch. */
@@ -108,18 +104,27 @@ int create_thread(void (*ip)(void)) {
 
     tcb_t *thread_tcb = (tcb_t *) malloc(sizeof(tcb_t));
 
-    enqueue(queue, thread_tcb);
+    enqueue(queue, (void *) thread_tcb);
 
     thread_tcb -> malloc_addr = stack;
     thread_tcb -> state = 0;
     long int *align_top = (void *)(((long int) stack & (-1 << 4)) + STACK_SIZE);
-    thread_tcb -> sp = align_top;
 
     *(align_top-1) = (long int) ip;
     *(align_top-2) = (long int) align_top;
 
+    thread_tcb -> sp = align_top - 16;
+
 #ifdef DEBUG
-    PRINT("TCB = %p size = %d\n", thread_tcb, queue -> size);
+    PRINT("arg ip         = %p\n", ip);
+    PRINT("align_top ptr  = %p\n", align_top);
+    PRINT("align_top - 1  = %p\n", align_top-1);
+    PRINT("align_top - 2  = %p\n", align_top-2);
+    PRINT("*(align_top-1) = %p\n", (void *) *(align_top-1));
+    PRINT("*(align_top-2) = %p\n", (void *) *(align_top-2));
+    PRINT("TCB = %p size  = %d\n", thread_tcb, queue -> size);
+    PRINT("thread_tcb     = %p\n", thread_tcb);
+    PRINT("thread_tcb->sp = %p\n", thread_tcb->sp);
 #endif
 
     return 0;
@@ -142,9 +147,14 @@ void yield() {
 void delete_thread(void) {
     /* When a user-level thread calls this you should not 
     * let it run any more but let others run
-    * make sure to exit when all user-level threads are dead */ 
+    * make sure to exit when all user-level threads are dead */
 
-       
+    void *remove;
+    dequeue(queue, &remove);
+
+    tcb_t *thread_tcb = (tcb_t *)remove;
+    PRINT("delete thr = %p\n", (void *) thread_tcb);
+
     //assert(!printf("Implement %s",__func__));
 }
 

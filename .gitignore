@@ -27,6 +27,7 @@
 *.i*86
 *.x86_64
 *.hex
+*.sh
 main
 
 # IDE
@@ -35,3 +36,4 @@ main
 # Debug files
 *.dSYM/
 *.su
+/run.sh
