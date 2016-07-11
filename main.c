@@ -16,7 +16,7 @@ void thread1(void) {
     int i = 1;
     for(;i<100;) {
         printf("%s: count = %d\n",__func__,i++);
-        yield();
+        //yield();
     }
 
     //delete_thread();
@@ -28,7 +28,7 @@ void thread2(void) {
     int i = -100;
     for(;i<0;) {
         printf("%s: count = %d\n",__func__,i++);
-        yield();
+        //yield();
     }
 
     //delete_thread();
@@ -40,16 +40,14 @@ int main(void) {
     printf("\nCreating thread 1\n");
     printf("%s : thread1 = %p\n", __func__, thread1);
     assert(!create_thread(thread1));
-    delete_thread();
 
-//    printf("\nCreating thread 2\n");
-//    printf("%s : thread2 = %p\n", __func__, thread1);
-//    assert(!create_thread(thread2));
+    printf("\nCreating thread 2\n");
+    printf("%s : thread2 = %p\n", __func__, thread1);
+    assert(!create_thread(thread2));
 
     //stop_main();        /* give up the CPU */
     //assert(0);          /* you should not come back */
 
-    sleep(2);
     return  0;
 }
 

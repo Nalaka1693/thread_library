@@ -1,5 +1,6 @@
 .text
 .global machine_switch
+.global rem_thread
 
 machine_switch:
 	# address of the new sp is arg1
@@ -25,7 +26,8 @@ machine_switch:
     push    %r15
     mov     %rsp, (%rsi)    # Store the old stack pointer in the old TCB
 
-    mov     (%rdi), %rsp    # Get the new stack pointer from the new TCB
+rem_thread:
+	mov     (%rdi), %rsp    # Get the new stack pointer from the new TCB
     pop     %r15
     pop     %r14
     pop     %r13
@@ -42,7 +44,5 @@ machine_switch:
     pop     %rax
     pop     %rbp
 
-    #jmp (%rbp)
-
-	ret 
+    ret
 

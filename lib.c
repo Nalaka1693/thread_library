@@ -36,6 +36,7 @@ int flag = 1;
 void machine_switch(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */);
 void switch_threads(tcb_t *newthread /* addr. of new TCB */, tcb_t *oldthread /* addr. of old TCB */);
 void init_thread_queue(void);
+void rem_thread(tcb_t *newthread);
 		    
 
 /** Data structures and functions to support thread control box */
@@ -125,6 +126,8 @@ int create_thread(void (*ip)(void)) {
     PRINT("TCB = %p size  = %d\n", thread_tcb, queue -> size);
     PRINT("thread_tcb     = %p\n", thread_tcb);
     PRINT("thread_tcb->sp = %p\n", thread_tcb->sp);
+    PRINT("&(tcb->sp)     = %p\n", &(thread_tcb->sp));
+    PRINT("queue peek = %p\n", queuePeek(queue));
 #endif
 
     return 0;
@@ -153,9 +156,9 @@ void delete_thread(void) {
     dequeue(queue, &remove);
 
     tcb_t *thread_tcb = (tcb_t *)remove;
+#ifdef DEBUG
     PRINT("delete thr = %p\n", (void *) thread_tcb);
-
-    //assert(!printf("Implement %s",__func__));
+#endif
 }
 
 
@@ -164,6 +167,9 @@ void stop_main(void) {
     * So we have no record of it. So hijack it. 
     * Do not put it into our ready queue, switch to something else.*/
 
+#ifdef DEBUG
+    PRINT("queue peek = %p\n", queuePeek(queue));
+#endif
 
-    //assert(!printf("Implement %s",__func__));
+    rem_thread(queuePeek(queue));
 }
